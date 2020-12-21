@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from past.builtins import xrange
 
+
 class TwoLayerNet(object):
     """
     A two-layer fully-connected neural network. The net has an input dimension of
@@ -80,7 +81,13 @@ class TwoLayerNet(object):
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        h1 = X.dot(W1) + b1
+        h2 = h1
+        h2[h2 < 0] = 0
+        h3 = h2.dot(W2) + b2
+        scores = h3
+        # h3 -= np.max(h3, axis=1, keepdims=True)
+        # scores = np.log(np.exp(h3) / np.sum(np.exp(h3), axis=1, keepdims=True))
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -98,7 +105,11 @@ class TwoLayerNet(object):
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        h3 -= np.max(scores, axis=1, keepdims=True)
+        probs = np.exp(h3) / np.sum(np.exp(h3), axis=1, keepdims=True)
+        loss = -np.sum(np.log(probs[np.arange(N), y]))
+        loss /= N
+        loss += 0.5 * reg * (np.sum(W1*W1) + np.sum(W2*W2)  + np.sum(b1*b1) + np.sum(b2*b2))
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -191,9 +202,9 @@ class TwoLayerNet(object):
                 learning_rate *= learning_rate_decay
 
         return {
-          'loss_history': loss_history,
-          'train_acc_history': train_acc_history,
-          'val_acc_history': val_acc_history,
+            'loss_history': loss_history,
+            'train_acc_history': train_acc_history,
+            'val_acc_history': val_acc_history,
         }
 
     def predict(self, X):
